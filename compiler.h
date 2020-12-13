@@ -15,9 +15,9 @@ private:
 
 	std::ofstream outFile;
 
-	void generateDataSegment();
-	void generateBssSegment();
-	void generateTextSegment(Parser *parser);
+	void generateDataSection();
+	void generateBssSection();
+	void generateTextSection(Parser *parser);
 
 	void translate(StatementStruct *statement);
 
@@ -32,7 +32,6 @@ private:
 
 	void translateExpression(ExprStruct expr);
 	void translateExpressionDiv(ExprStruct expr);
-	void translateExpressionRemainder(ExprStruct expr);
 
 	std::string operationSpecifier(int size);
 	std::string instantToString(Token tok);

@@ -182,7 +182,7 @@ void tempo(string str1, string str2) {
 }
 
 int main() {
-	string fileName = "_test1.s";
+	string fileName = "tests/test1.s";
 	// testInputStream(fileName);
 	// testLexer(fileName);
 	// testParser(fileName);

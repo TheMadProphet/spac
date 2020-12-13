@@ -1,9 +1,10 @@
 #include "types.h"
+#include <string>
 
 bool contains(const std::string arr[], std::string str) {
 	int i = 0;
 	while (arr[i] != "") {
-		if (arr[i] == str)
+		if ( arr[i] == str)
 			return true;
 		i++;
 	}
@@ -61,6 +62,7 @@ std::string toRealRegister(std::string reg, int size) {
 	int i = 0;
 	while (registers[i] != "") {
 		if (registers[i] == reg) {
+			if (size == 8) return registers64[i];
 			if (size == 4) return registers32[i];
 			if (size == 2) return registers16[i];
 			if (size == 1) return registers8[i];

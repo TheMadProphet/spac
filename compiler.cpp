@@ -3,7 +3,7 @@
 #include <string>
 
 Compiler::Compiler() {
-	outFile = std::ofstream("out.asm");
+	outFile = std::ofstream("a.asm");
 
 
 	// Generate 'headers'
@@ -14,19 +14,19 @@ Compiler::~Compiler() {
 }
 
 void Compiler::Compile(Parser *parser) {
-	generateDataSegment();
-	generateBssSegment();
-	generateTextSegment(parser);
+	generateDataSection();
+	generateBssSection();
+	generateTextSection(parser);
 }
 
-void Compiler::generateDataSegment() {
-	writeLine("SECTION .data");
+void Compiler::generateDataSection() {
+	writeLine("SECTION .data			; Section containing initialized data");
 
 	writeLine("");
 }
 
-void Compiler::generateBssSegment() {
-	writeLine("SECTION .bss");
+void Compiler::generateBssSection() {
+	writeLine("SECTION .bss			; Section containing uninitialized data");
 
 	writeInstr("savedEAX resb 4");
 	writeInstr("savedEDX resb 4");
@@ -34,10 +34,11 @@ void Compiler::generateBssSegment() {
 	writeLine("");
 }
 
-void Compiler::generateTextSegment(Parser *parser) {
-	writeLine("SECTION .text\n");
-	writeLine("global _start\n");
-	writeLine("_start:");
+void Compiler::generateTextSection(Parser *parser) {
+	writeLine("SECTION .text			; Section containing code\n");
+	writeLine("global main\n");
+	writeLine("main:");
+	writeInstr("nop");
 
 	std::vector<StatementStruct *> statements = parser->parse();
 
@@ -197,10 +198,6 @@ void Compiler::translateExpression(ExprStruct expr) {
 		writeInstr("or EAX, " + instantToString(expr.operand2));
 		break;
 
-	case '%':
-		translateExpressionRemainder(expr);
-		break;
-
 	default:
 		break;
 	}
@@ -210,13 +207,5 @@ void Compiler::translateExpressionDiv(ExprStruct expr) {
 	writeInstr("mov dword [savedEDX], EDX");
 	writeInstr("mov EDX, 0");
 	writeInstr("idiv " + instantToString(expr.operand2));
-	writeInstr("mov EDX, [savedEDX]");
-}
-
-void Compiler::translateExpressionRemainder(ExprStruct expr) {
-	writeInstr("mov dword [savedEDX], EDX");
-	writeInstr("mov EDX, 0");
-	writeInstr("idiv " + instantToString(expr.operand2));
-	writeInstr("mov EAX, EDX");
 	writeInstr("mov EDX, [savedEDX]");
 }
