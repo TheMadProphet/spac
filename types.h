@@ -14,7 +14,7 @@ static const std::string registers32[] = {"EDI", "ESI", "EDX", "ECX", "R8D", "R9
 static const std::string registers16[] = {"DI" , "SI" , "DX" , "CX" , "R8W", "R9W", "R10W","R11W","SP" , "RIP", "AX" , ""};
 static const std::string registers8[] =  {"DIL", "SIL", "DL" , "CL" , "R8B", "R9B", "R10B","R11B","SPL", "RIP", "AL" , ""};
 static const std::string jumps[] = {"BLT","BLE","BGT","BGE","BEQ","BNE","Jmp", ""};
-static const std::string keywords[] = {"CALL", "RET", "SYSCALL", "SECTION", "", ".text", ""};
+static const std::string keywords[] = {"INCLUDE", "SECTION", "DATA", "TEXT", "BSS", "GLOBAL", "EXTERN", "CALL", "RET", "SYSCALL", ""};
 static const std::string conversionKwords[] = {"ItoF", "FtoI", ""};
 
 bool isWhitespace(char c);
@@ -28,7 +28,15 @@ bool isJmpInstr(std::string str);
 bool isKeyword(std::string str);
 bool isLoaded(Type t);
 
+// Converts pseudo-register to real one (register size is 4)
 std::string toRealRegister(std::string reg);
+// Converts pseudo-register to real one (register size is value passed)
 std::string toRealRegister(std::string reg, int size);
+
+// Check whethere given keywowrd requires an argument
+bool keywordNeedsArgument(std::string kw);
+
+// Case-insensitive compare function for strings
+bool strEqu(std::string s1, std::string s2);
 
 #endif

@@ -11,8 +11,6 @@ public:
 	void Compile(Parser *parser);
 
 private:
-	//std::vector<StatementStruct *> statements;
-
 	std::ofstream outFile;
 
 	void generateDataSection();

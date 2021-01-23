@@ -4,7 +4,8 @@
 #include "lexer.h"
 #include <vector>
 
-enum StatementType {JUMP, LOAD, STORE, CONVERT, KEYWORD};
+enum StatementType {JUMP, LOAD, STORE, CONVERT, KEYWORD, INCLUDE};
+enum Section {DATA, BSS, TEXT};
 
 struct ExprStruct {
 	Token operand1;
@@ -34,6 +35,13 @@ public:
 	~Parser();
 	
 	std::vector<StatementStruct *> parse();
+
+	struct parserContainter {
+		std::vector<StatementStruct *> dataStatements;	// Initialized data
+		std::vector<StatementStruct *> bssStatements;	//
+		std::vector<StatementStruct *> textStatements;	// The code
+		std::vector<StatementStruct *> otherStatements;	// Include, Extern, Global...
+	};
 
 	struct JmpStruct {
 		std::string instruction;	// Branching intruction
@@ -70,21 +78,27 @@ public:
 	};
 
 	struct KeyStruct {
-		std::string instruction;	// syscall, call, ret
-		std::string value;			// if call, this will have func name
+		std::string instruction;	// section, include, extern, global, syscall, call, ret
+		std::string value;			// for keywords which require arguments
 		
 		KeyStruct() {
 			value = "";
 		}
 	};
+
 private:
 	Lexer *lx;
 	// List of all the parsed statements
 	std::vector<StatementStruct *> statements;
+	Section currentSection;
 
 	// Prints error message and token's coordinates
 	void printError(std::string name, std::string error, Token t);
 	void printTokenLine(Token t);
+
+	bool parseTextStatement(Token first);
+	bool parseDataStatement(Token first);
+	bool parseOtherStatement(Token tok);
 
 	// Parses a jump/branch instruction
 	bool parseJump();

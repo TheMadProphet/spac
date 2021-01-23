@@ -181,7 +181,7 @@ void tempo(string str1, string str2) {
 	cout << str1 << "," << str2 << endl;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
 	string fileName = "tests/test1.s";
 	// testInputStream(fileName);
 	// testLexer(fileName);

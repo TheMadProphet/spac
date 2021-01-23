@@ -46,6 +46,7 @@ Token Lexer::_read() {
 
 	// Type cases
 	if (c == '"') return readString();
+	if (c == '\'') return readCharacter();
 	if (isdigit(c) != 0) return readNumber();
 	if (isPunct(c)) return Token(PUNC, is->consume());
 	if (isOperand(c)) return readOperand();
@@ -67,6 +68,17 @@ Token Lexer::readString() {
 	Token res(STR, is->consume());
 	std::string value = "";
 	while (is->peek().c != '"') {
+		value += is->consume().c;
+	}
+	is->consume();
+	res.value = value;
+	return res;
+}
+
+Token Lexer::readCharacter() {
+	Token res(CHR, is->consume());
+	std::string value = "";
+	while (is->peek().c != '\'') {
 		value += is->consume().c;
 	}
 	is->consume();

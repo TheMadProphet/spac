@@ -1,10 +1,19 @@
 #include "types.h"
 #include <string>
 
-bool contains(const std::string arr[], std::string str) {
+inline bool charCmp(char a, char b) {
+	return(toupper(a) == toupper(b));
+}
+
+bool strEqu(std::string s1, std::string s2) {
+	return((s1.size() == s2.size()) &&
+			std::equal(s1.begin(), s1.end(), s2.begin(), charCmp));
+}
+
+bool setContains(const std::string arr[], std::string str) {
 	int i = 0;
 	while (arr[i] != "") {
-		if ( arr[i] == str)
+		if (strEqu(arr[i], str))
 			return true;
 		i++;
 	}
@@ -25,19 +34,19 @@ bool isPunct(char c) {
 
 
 bool isRegister(std::string str) {
-	return contains(registers, str);
+	return setContains(registers, str);
 }
 
 bool isJmpInstr(std::string str) {
-	return contains(jumps, str);
+	return setContains(jumps, str);
 }
 
 bool isKeyword(std::string str) {
-	return contains(keywords, str);
+	return setContains(keywords, str);
 }
 
 bool isConversionKword(std::string str) {
-	return contains(conversionKwords, str);
+	return setContains(conversionKwords, str);
 }
 
 bool isLoaded(Type t) {
@@ -70,4 +79,11 @@ std::string toRealRegister(std::string reg, int size) {
 		i++;
 	}
 	return "";
+}
+
+bool keywordNeedsArgument(std::string kw) {
+	return strEqu(kw, "CALL")
+		|| strEqu(kw, "SECTION")
+		|| strEqu(kw, "GLOBAL")
+		|| strEqu(kw, "EXTERN");
 }

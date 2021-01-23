@@ -7,6 +7,7 @@
 enum Type { PUNC,	// Punctiation
  			NUM,	// Number
 			STR,	// String
+			CHR,	// Character
 			KW,		// Keyword
 			JMP,	// Jump
 			REG,	// Register
@@ -64,6 +65,7 @@ private:
 	void skipComment();
 
 	Token readString();
+	Token readCharacter();
 	Token readNumber();
 	Token readOperand();
 	Token readIdentifier();

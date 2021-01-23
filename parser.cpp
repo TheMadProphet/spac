@@ -21,6 +21,7 @@
 Parser::Parser(Lexer *lexer) {
 	lx = lexer;
 	statements.clear();
+	currentSection = TEXT;
 }
 
 Parser::~Parser() {
@@ -126,13 +127,24 @@ bool Parser::parseKeyword() {
 	res->ptr = ptr;
 	res->line = line;
 
-	// If its call, get function name
-	if (instruction.value == "CALL") {
+	// If its needs arguemnt, add it to structure
+	if (keywordNeedsArgument(instruction.value)) {
 		Token tok = lx->read();
+		if (tok.value != "<") {
+			// TODO: if its identifier..
+			ptr->value = tok.value;
+
+			if (strEqu(tok.value, "DATA")) {
+				currentSection = DATA;
+			} else if (strEqu(tok.value, "TEXT")) {
+				currentSection = TEXT;
+			}
+		}
+
 		ASSERT(tok.value, "<", tok);
 
 		tok = lx->read();
-		// if its identifier..
+		// TODO: if its identifier..
 		ptr->value = tok.value;
 
 		tok = lx->read();
@@ -331,6 +343,56 @@ bool Parser::parseStore() {
 	return true;
 }
 
+bool Parser::parseDataStatement(Token tok) {
+
+}
+
+bool Parser::parseTextStatement(Token tok) {
+	switch (tok.type) {
+		case JMP:
+			return parseJump();
+		case KW:
+			return parseKeyword();
+		case REG:
+			return parseLoad();
+		case REF:
+			return parseStore();
+		
+		default:
+			printError("Unexpected", "Unexpected error", tok);
+			if (tok.value[0] == 'R')
+				std::cout << "Possible solution: Make sure to use registers up to"
+				<< " 8: R[1-8]" << std::endl;
+			return false;
+	}
+}
+
+bool Parser::parseOtherStatement(Token tok) {
+	lx->read();
+	if (tok.type == KW) {
+		// section, include, extern, global
+		if (strEqu(tok.value, "SECTION")) {
+			Token val = lx->read();
+			if (val.type == KW) {
+				if (strEqu(val.value, "DATA")) {
+					currentSection = DATA;
+				} else if (strEqu(val.value, "BSS")) {
+					currentSection = BSS;
+
+				} else if (strEqu(val.value, "TEXT")) {
+					currentSection = TEXT;
+
+				}
+
+			}
+		} else if (tok.value == "include") {
+			
+		}
+	} else {
+		printError("Parse", "Undefined identifier", tok);
+	}
+}
+
 std::vector<StatementStruct*> Parser::parse() {
 	while (true) {
 		Token first = lx->peek();
@@ -338,31 +400,21 @@ std::vector<StatementStruct*> Parser::parse() {
 			lx->read();
 			first = lx->peek();
 		}
-		bool success;
-		switch (first.type) {
-		case JMP:
-			success = parseJump();
-			break;
-		case KW:
-			success = parseKeyword();
-			break;
-		case REG:
-			success = parseLoad();
-			break;
-		case REF:
-			success = parseStore();
-			break;
-		case END:
-			return statements;
-		
-		default:
-			success = false;
-			printError("Unexpected", "Unexpected error", first);
-			if (first.value[0] == 'R')
-				std::cout << "Possible solution: Make sure to use registers up to 5: R[1-5]"
-				 << std::endl;
-			break;
+		if (first.type == END) {
+			// finish
 		}
+
+		bool success;
+		if (currentSection == TEXT) {
+			success = parseTextStatement(first);
+		} else if (currentSection == BSS) {
+
+		} else if (currentSection == DATA) {
+			success = parseDataStatement(first);
+		} else {
+			success = parseOtherStatement(first);
+		}
+
 		if (success) {
 			if (first.type != KW && lx->peek().value != ";")
 				printError("", "Expected ';' symbol", lx->peek());
